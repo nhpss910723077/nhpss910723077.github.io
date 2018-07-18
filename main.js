@@ -8,17 +8,10 @@ var height = canvas.height = window.innerHeight;
 var scoreText = document.querySelector('p');
 var count = 0;
 
-
 function random(min, max) {
     var num = Math.floor(Math.random() * (max - min)) + min;
     return num;
 }
-
-var canvas = document.querySelector('canvas');
-var ctx = canvas.getContext('2d');
-
-var width = canvas.width = window.innerWidth;
-var height = canvas.height = window.innerHeight;
 
 function Shape(x, y, velX, velY, exists) {
     this.x = x;
@@ -27,7 +20,7 @@ function Shape(x, y, velX, velY, exists) {
     this.velY = velY;
     this.exists = exists;
 }
-function Ball(x, y, velX, velY, exists, color, size,cd) {
+function Ball(x, y, velX, velY, exists, color, size, cd) {
     Shape.call(this, x, y, velX, velY, exists);
     this.color = color;
     this.size = size;
@@ -43,21 +36,21 @@ Ball.prototype.draw = function () {
 
 Ball.prototype.update = function () {
     if ((this.x + this.size) >= width) {
-        this.velX = -(this.velX);
+        this.velX = -(Math.abs(this.velX));
     }
 
     if ((this.x - this.size) <= 0) {
-        this.velX = -(this.velX);
+        this.velX = (Math.abs(this.velX));
     }
 
     if ((this.y + this.size) >= height) {
-        this.velY = -(this.velY);
+        this.velY = -(Math.abs(this.velY));
     }
 
     if ((this.y - this.size) <= 0) {
-        this.velY = -(this.velY);
+        this.velY = (Math.abs(this.velY));
     }
-
+    this.cd++;
     this.x += this.velX;
     this.y += this.velY;
 }
@@ -68,24 +61,15 @@ Ball.prototype.collisionDetect = function () {
             var dx = this.x - balls[j].x;
             var dy = this.y - balls[j].y;
             var distance = Math.sqrt(dx * dx + dy * dy);
-            balls[j].cd++;
 
-            if (distance < this.size + balls[j].size && balls[j].cd > 10 * balls.length) {
+
+
+            if (distance < this.size + balls[j].size && balls[j].cd > 10) {
                 balls[j].cd = 0;
-
                 balls[j].color = this.color = 'rgb(' + random(0, 255) + ',' + random(0, 255) + ',' + random(0, 255) + ')';
 
                 this.velX = -(this.velX);
-                this.velY = -(this.velY);
-                /*
-                balls[j].velX = -(balls[j].velX);
-                balls[j].velY = -(balls[j].velY);
-
-                this.x += 2 * this.velX;
-                this.y += 2 * this.velY;
-                balls[j].x += 2 * balls[j].velX;
-                balls[j].y += 2 * balls[j].velY;
-                */
+                this.velY = -(this.velY);       
             }
         }
     }
@@ -158,10 +142,10 @@ var circle = new Circle(50, 50, true);
 circle.controls();
 
 function loop() {
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
     ctx.fillRect(0, 0, width, height);
 
-    while (balls.length < 25) {
+    while (balls.length < 100) {
         var ball = new Ball(
             random(0, width),
             random(0, height),
@@ -173,12 +157,12 @@ function loop() {
         );
         balls.push(ball);
     }
-    
+
     circle.checkBounds();
     circle.collisionDetect();
     circle.draw();
 
-    scoreText.textContent ="Your score:" +count;
+    scoreText.textContent = "Your score:" + count;
 
     for (var i = 0; i < balls.length; i++) {
         if (balls[i].exists) {
